@@ -1,6 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import { Home } from "./pages/Home";
-import { Settings } from "./pages/Settings";
+import { Home } from "./pages/Home/Home";
+import { Settings } from "./pages/Settings/Settings";
 import {
   DefaultTheme,
   NavigationContainer,
