@@ -1,13 +1,17 @@
 import { View } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { Texts } from "../../shared/components/Texts/Texts";
 import { Progress } from "../../shared/components/Progress/Progress";
-import { Buttons } from "../../shared/components/Button/Button";
 import { Pomodoros } from "../../shared/components/Pomodoros/Pomodoros";
 import { ReturnBtn } from "../../shared/components/Header/ReturnBtn";
 import { styles } from "./styles";
+import { RenderHomeControls } from "../../shared/components/Home/home.controls";
+import { RenderHomeStatusText } from "../../shared/components/Home/home.texts";
 
 export const Home = () => {
+  const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+
   return (
     <View style={styles.mainContainer}>
       <ReturnBtn nameIcon="settings" nameNavigation="Settings" />
@@ -18,10 +22,11 @@ export const Home = () => {
         </View>
 
         <View style={styles.stateContainer}>
-          <Texts sxText={styles.stateText}>Hora de se concentrar</Texts>
-          <Texts sxText={styles.stateText}>Pausa curta</Texts>
-          <Texts sxText={styles.stateText}>Pausa longa</Texts>
-          <Texts sxText={styles.stateText}>Cronometro em pausa</Texts>
+          <RenderHomeStatusText
+            isRunning={isRunning}
+            isPaused={isPaused}
+            textStyle={styles.stateText}
+          />
         </View>
 
         <Progress
@@ -32,46 +37,13 @@ export const Home = () => {
           25:00
         </Progress>
 
-        <View style={styles.buttonContainer}>
-          <Buttons
-            sxTouchableBtn={styles.primaryButton}
-            sxTextBtn={styles.primaryButtonText}
-          >
-            Iniciar
-          </Buttons>
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <Buttons
-            sxTouchableBtn={styles.primaryButton}
-            sxTextBtn={styles.primaryButtonText}
-          >
-            Pausar
-          </Buttons>
-
-          <Buttons
-            sxTouchableBtn={styles.secondaryButton}
-            sxTextBtn={styles.secondaryButtonText}
-          >
-            Parar
-          </Buttons>
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <Buttons
-            sxTouchableBtn={styles.primaryButton}
-            sxTextBtn={styles.primaryButtonText}
-          >
-            Continuar
-          </Buttons>
-
-          <Buttons
-            sxTouchableBtn={styles.secondaryButton}
-            sxTextBtn={styles.secondaryButtonText}
-          >
-            Reiniciar
-          </Buttons>
-        </View>
+        <RenderHomeControls
+          isRunning={isRunning}
+          isPaused={isPaused}
+          styles={styles}
+          setIsRunning={setIsRunning}
+          setIsPaused={setIsPaused}
+        />
 
         <Pomodoros />
       </View>

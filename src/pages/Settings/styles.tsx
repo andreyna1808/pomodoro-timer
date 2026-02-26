@@ -20,7 +20,6 @@ export const styles = StyleSheet.create({
     fontFamily: Theme.fonts.interRegular,
   },
   secondaryButton: {
-    borderWidth: 2,
     borderRadius: 55,
     paddingVertical: 8,
     paddingHorizontal: 16,
