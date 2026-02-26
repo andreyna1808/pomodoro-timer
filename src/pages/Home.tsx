@@ -1,26 +1,16 @@
-import { useNavigation } from "@react-navigation/native";
-import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
-import { TScreenDefinitionsProps } from "../AppRoute";
+import { View, StyleSheet } from "react-native";
 import { Theme } from "../shared/themes/Theme";
 import React from "react";
-import { AnimatedCircularProgress } from "react-native-circular-progress";
-import { MaterialIcons } from "@expo/vector-icons";
 import { Texts } from "../shared/components/Texts/Texts";
 import { Progress } from "../shared/components/Progress/Progress";
 import { Buttons } from "../shared/components/Button/Button";
 import { Pomodoros } from "../shared/components/Pomodoros/Pomodoros";
+import { ReturnBtn } from "../shared/components/Header/ReturnBtn";
 
 export const Home = () => {
-  const navigation = useNavigation<TScreenDefinitionsProps>();
-
   return (
     <View style={styles.mainContainer}>
-      <TouchableOpacity
-        style={styles.settingsButton}
-        onPress={() => navigation.navigate("Settings")}
-      >
-        <MaterialIcons size={28} name="settings" color={Theme.colors.divider} />
-      </TouchableOpacity>
+      <ReturnBtn nameIcon="settings" nameNavigation="Settings" />
 
       <View style={styles.container}>
         <View style={styles.titleContainer}>

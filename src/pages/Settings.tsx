@@ -3,20 +3,12 @@ import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import { TScreenDefinitionsProps } from "../AppRoute";
 import { Theme } from "../shared/themes/Theme";
 import React from "react";
-import { AnimatedCircularProgress } from "react-native-circular-progress";
-import { MaterialIcons } from "@expo/vector-icons";
+import { ReturnBtn } from "../shared/components/Header/ReturnBtn";
 
 export const Settings = () => {
-  const navigation = useNavigation<TScreenDefinitionsProps>();
-
   return (
     <View style={styles.mainContainer}>
-      <TouchableOpacity
-        style={styles.settingsButton}
-        onPress={() => navigation.goBack()}
-      >
-        <MaterialIcons size={28} name="close" color={Theme.colors.divider} />
-      </TouchableOpacity>
+      <ReturnBtn nameIcon="close" nameNavigation="Home" />
 
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>Configurações</Text>
@@ -82,7 +74,7 @@ export const Settings = () => {
 
           <View style={styles.formFieldButtons}>
             <TouchableOpacity style={styles.primaryButton}>
-              <Text style={styles.primaryButtonText}>Atividade</Text>
+              <Text style={styles.primaryButtonText}>Ativado</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.primaryButton}>
               <Text style={styles.primaryButtonText}>Desativado</Text>
@@ -99,16 +91,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     alignItems: "center",
-    justifyContent: "center",
-  },
-  container: {
-    gap: 36,
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  settingsButton: {
-    alignSelf: "flex-end",
+    justifyContent: "flex-start",
   },
   primaryButton: {
     backgroundColor: Theme.colors.primary,
@@ -135,10 +118,11 @@ const styles = StyleSheet.create({
     fontFamily: Theme.fonts.interRegular,
   },
   formContainer: {
+    marginTop: 24,
+    display: "flex",
     flexDirection: "column",
-    justifyContent: "center",
-    gap: 16,
-    width: "100%",
+    justifyContent: "flex-start",
+    width: "80%",
   },
   titleContainer: {
     alignItems: "center",
