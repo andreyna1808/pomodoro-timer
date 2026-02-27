@@ -15,17 +15,39 @@ type renderHomeControlsProps = {
   isRunning: boolean;
   isPaused: boolean;
   styles: HomeStylesProps;
+  counterCircleTime: number;
   setIsRunning: Dispatch<SetStateAction<boolean>>;
   setIsPaused: Dispatch<SetStateAction<boolean>>;
+  setStepIndicator: Dispatch<SetStateAction<1 | 2 | 3 | 4>>;
+  setCounterCircleTime: Dispatch<SetStateAction<number>>;
+  setCurrentStatus: Dispatch<
+    SetStateAction<"focus" | "short_break" | "long_break" | "paused">
+  >;
 };
 
-export function RenderHomeControls({
+export const RenderHomeControls = ({
+  counterCircleTime,
   isRunning,
   isPaused,
   styles,
   setIsRunning,
   setIsPaused,
-}: renderHomeControlsProps) {
+  setStepIndicator,
+  setCurrentStatus,
+  setCounterCircleTime,
+}: renderHomeControlsProps) => {
+  const onPressStop = () => {
+    setIsRunning(false);
+    setIsPaused(false);
+    setCounterCircleTime(counterCircleTime);
+    setStepIndicator(1);
+  };
+
+  const onPressPaused = () => {
+    setIsPaused(true);
+    setCurrentStatus("paused");
+  };
+
   switch (true) {
     case !isRunning && !isPaused:
       return (
@@ -44,7 +66,7 @@ export function RenderHomeControls({
           <Buttons
             sxTouchableBtn={styles.primaryButton}
             sxTextBtn={styles.primaryButtonText}
-            onPress={() => setIsPaused(true)}
+            onPress={onPressPaused}
           >
             Pausar
           </Buttons>
@@ -52,7 +74,7 @@ export function RenderHomeControls({
           <Buttons
             sxTouchableBtn={styles.secondaryButton}
             sxTextBtn={styles.secondaryButtonText}
-            onPress={() => setIsRunning(false)}
+            onPress={onPressStop}
           >
             Parar
           </Buttons>
@@ -86,4 +108,4 @@ export function RenderHomeControls({
     default:
       return null;
   }
-}
+};

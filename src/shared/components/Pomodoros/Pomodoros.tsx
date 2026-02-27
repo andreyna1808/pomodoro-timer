@@ -1,17 +1,19 @@
 import { Text, View, StyleSheet } from "react-native";
 import { Theme } from "../../themes/Theme";
 
-type TPomodorosProps = {};
+type TPomodorosProps = {
+  stepIndicator: 1 | 2 | 3 | 4;
+};
 
-export const Pomodoros = ({}: TPomodorosProps) => {
+export const Pomodoros = ({ stepIndicator }: TPomodorosProps) => {
   return (
     <View style={styles.pomodorosContainer}>
       <Text style={styles.pomodorosText}>Pomodoros:</Text>
 
-      <View style={styles.pomodorosIndicatorComplete} />
-      <View style={styles.pomodorosIndicatorComplete} />
-      <View style={styles.pomodorosIndicator} />
-      <View style={styles.pomodorosIndicator} />
+      <View style={stepIndicator >= 1 ? styles.pomodorosIndicatorComplete : styles.pomodorosIndicator} />
+      <View style={stepIndicator >= 2 ? styles.pomodorosIndicatorComplete : styles.pomodorosIndicator} />
+      <View style={stepIndicator >= 3 ? styles.pomodorosIndicatorComplete : styles.pomodorosIndicator} />
+      <View style={stepIndicator >= 4 ? styles.pomodorosIndicatorComplete : styles.pomodorosIndicator} />
     </View>
   );
 };
