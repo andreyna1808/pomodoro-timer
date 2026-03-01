@@ -16,6 +16,7 @@ type renderHomeControlsProps = {
   isPaused: boolean;
   styles: HomeStylesProps;
   counterCircleTime: number;
+  updateLocalStorage: Function;
   setIsRunning: Dispatch<SetStateAction<boolean>>;
   setIsPaused: Dispatch<SetStateAction<boolean>>;
   setStepIndicator: Dispatch<SetStateAction<1 | 2 | 3 | 4>>;
@@ -30,6 +31,7 @@ export const RenderHomeControls = ({
   isRunning,
   isPaused,
   styles,
+  updateLocalStorage,
   setIsRunning,
   setIsPaused,
   setStepIndicator,
@@ -42,11 +44,19 @@ export const RenderHomeControls = ({
     setCounterCircleTime(counterCircleTime);
     setStepIndicator(1);
     setCurrentStatus("focus");
+    updateLocalStorage({
+      isPausedUpdate: false,
+      isRunningUpdate: false,
+      stepIndicatorUpdate: 1,
+      currentStatusUpdate: "focus",
+      counterCircleTimeUpdate: counterCircleTime,
+    });
   };
 
   const onPressPaused = () => {
     setIsPaused(true);
     setCurrentStatus("paused");
+    updateLocalStorage({ isPausedUpdate: true });
   };
 
   switch (true) {
@@ -55,7 +65,10 @@ export const RenderHomeControls = ({
         <Buttons
           sxTouchableBtn={styles.primaryButton}
           sxTextBtn={styles.primaryButtonText}
-          onPress={() => setIsRunning(true)}
+          onPress={() => {
+            setIsRunning(true);
+            updateLocalStorage({ isRunningUpdate: true });
+          }}
         >
           Iniciar
         </Buttons>
@@ -88,7 +101,10 @@ export const RenderHomeControls = ({
           <Buttons
             sxTouchableBtn={styles.primaryButton}
             sxTextBtn={styles.primaryButtonText}
-            onPress={() => setIsPaused(false)}
+            onPress={() => {
+              setIsPaused(false);
+              updateLocalStorage({ isPausedUpdate: false });
+            }}
           >
             Continuar
           </Buttons>
@@ -99,6 +115,11 @@ export const RenderHomeControls = ({
             onPress={() => {
               setIsRunning(false);
               setIsPaused(false);
+
+              updateLocalStorage({
+                isPausedUpdate: false,
+                isRunningUpdate: false,
+              });
             }}
           >
             Reiniciar

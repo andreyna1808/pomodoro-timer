@@ -1,5 +1,11 @@
-import { Text, View } from "react-native";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { AppState, Text, View } from "react-native";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Texts } from "../../shared/components/Texts/Texts";
 import { Progress } from "../../shared/components/Progress/Progress";
 import { Pomodoros } from "../../shared/components/Pomodoros/Pomodoros";
@@ -9,16 +15,29 @@ import { RenderHomeControls } from "../../shared/components/Home/home.controls";
 import { RenderHomeStatusText } from "../../shared/components/Home/home.texts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
+import { updateStateByElapsedTime } from "../../shared/helpers/UpdateStateByElapsedTime";
+
+type AppStateProps = {
+  isPausedUpdate?: boolean;
+  isRunningUpdate?: boolean;
+  stepIndicatorUpdate?: 1 | 2 | 3 | 4;
+  counterCircleTimeUpdate?: number;
+  currentStatusUpdate?: "focus" | "short_break" | "long_break";
+};
 
 export const Home = () => {
+  const [appRunningState, setAppRunningState] = useState(AppState.currentState);
+  useEffect(() => {
+    const listener = AppState.addEventListener("change", setAppRunningState);
+    return () => listener.remove();
+  }, []);
+
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [stepIndicator, setStepIndicator] = useState<1 | 2 | 3 | 4>(1);
-
   const [currentStatus, setCurrentStatus] = useState<
     "focus" | "short_break" | "long_break" | "paused"
   >("focus");
-
   const [currentFocusCircleTime, setCurrentFocusCircleTime] = useState(25 * 60);
   const [currentShortBreakCircleTime, setCurrentShortBreakCircleTime] =
     useState(5 * 60);
@@ -38,23 +57,9 @@ export const Home = () => {
         setCurrentShortBreakCircleTime(JSON.parse(short || "5") * 60);
         setCurrentLongBreakCircleTime(JSON.parse(long || "15") * 60);
         setCurrentFocusCircleTime(JSON.parse(focus || "25") * 60);
-        setCounterCircleTime(JSON.parse(focus || "25") * 60);
       });
     }, []),
   );
-
-  useEffect(() => {
-    AsyncStorage.getItem("APP_STATE").then((value) => {
-      const appState = JSON.parse(value || "null");
-      if (!appState) return;
-
-      setCurrentStatus(appState.currentStatus);
-      setIsRunning(appState.isRunning);
-      setIsPaused(appState.isPaused);
-      setStepIndicator(appState.step);
-      setCounterCircleTime(appState.counterCircleTime);
-    });
-  }, []);
 
   useEffect(() => {
     const ref = setInterval(() => {
@@ -91,27 +96,60 @@ export const Home = () => {
       default:
         break;
     }
-
-    AsyncStorage.setItem(
-      "APP_STATE",
-      JSON.stringify({
-        stepIndicator,
-        isPaused,
-        isRunning,
-        currentStatus,
-        time: Date.now(),
-        counterCircleTime,
-      }),
-    );
   }, [
-    isRunning,
-    isPaused,
     counterCircleTime,
     currentStatus,
     stepIndicator,
     currentShortBreakCircleTime,
     currentLongBreakCircleTime,
   ]);
+
+  const isShouldUpdate = useRef(true);
+  useEffect(() => {
+    if (isShouldUpdate.current) {
+      isShouldUpdate.current = false;
+
+      AsyncStorage.getItem("APP_STATE").then((value) => {
+        const appState = JSON.parse(value || "null");
+        if (!appState) return;
+
+        const updateAppState = updateStateByElapsedTime(appState);
+
+        setCurrentStatus(updateAppState.currentStatus);
+        setIsRunning(updateAppState.isRunning);
+        setIsPaused(updateAppState.isPaused);
+        setStepIndicator(updateAppState.stepIndicator);
+        setCounterCircleTime(updateAppState.counterCircleTime);
+      });
+    }
+
+    if (appRunningState === "background") {
+      isShouldUpdate.current = true;
+    }
+  }, [appRunningState]);
+
+  const updateLocalStorage = ({
+    stepIndicatorUpdate,
+    isPausedUpdate,
+    isRunningUpdate,
+    currentStatusUpdate,
+    counterCircleTimeUpdate,
+  }: AppStateProps) => {
+    AsyncStorage.setItem(
+      "APP_STATE",
+      JSON.stringify({
+        stepIndicator: stepIndicatorUpdate ?? stepIndicator,
+        isPaused: isPausedUpdate ?? isPaused,
+        isRunning: isRunningUpdate ?? isRunning,
+        currentStatus: currentStatusUpdate ?? currentStatus,
+        counterCircleTime: counterCircleTimeUpdate ?? counterCircleTime,
+        time: Date.now(),
+        currentFocusCircleTime,
+        currentShortBreakCircleTime,
+        currentLongBreakCircleTime,
+      }),
+    );
+  };
 
   const timeProgress = useMemo(() => {
     switch (currentStatus) {
@@ -134,7 +172,11 @@ export const Home = () => {
 
   return (
     <View style={styles.mainContainer}>
-      <ReturnBtn nameIcon="settings" nameNavigation="Settings" />
+      <ReturnBtn
+        nameIcon="settings"
+        nameNavigation="Settings"
+        isDisabled={isRunning}
+      />
 
       <View style={styles.container}>
         <View style={styles.titleContainer}>
@@ -168,6 +210,7 @@ export const Home = () => {
           setStepIndicator={setStepIndicator}
           setCurrentStatus={setCurrentStatus}
           setCounterCircleTime={setCounterCircleTime}
+          updateLocalStorage={updateLocalStorage}
         />
 
         <Pomodoros
