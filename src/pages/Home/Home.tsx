@@ -27,7 +27,8 @@ export const Home = () => {
   );
   const [counterCircleTime, setCounterCircleTime] = useState(25 * 60);
 
-  useFocusEffect( // Toda vez que a tela for focada de novo, ele faz essa consulta (Saio da tela e volto para ela, por exemplo)
+  useFocusEffect(
+    // Toda vez que a tela for focada de novo, ele faz essa consulta (Saio da tela e volto para ela, por exemplo)
     useCallback(() => {
       Promise.all([
         AsyncStorage.getItem("SHORT_BREAK_PERIOD"),
@@ -41,6 +42,19 @@ export const Home = () => {
       });
     }, []),
   );
+
+  useEffect(() => {
+    AsyncStorage.getItem("APP_STATE").then((value) => {
+      const appState = JSON.parse(value || "null");
+      if (!appState) return;
+
+      setCurrentStatus(appState.currentStatus);
+      setIsRunning(appState.isRunning);
+      setIsPaused(appState.isPaused);
+      setStepIndicator(appState.step);
+      setCounterCircleTime(appState.counterCircleTime);
+    });
+  }, []);
 
   useEffect(() => {
     const ref = setInterval(() => {
@@ -77,7 +91,21 @@ export const Home = () => {
       default:
         break;
     }
+
+    AsyncStorage.setItem(
+      "APP_STATE",
+      JSON.stringify({
+        stepIndicator,
+        isPaused,
+        isRunning,
+        currentStatus,
+        time: Date.now(),
+        counterCircleTime,
+      }),
+    );
   }, [
+    isRunning,
+    isPaused,
     counterCircleTime,
     currentStatus,
     stepIndicator,
@@ -142,7 +170,10 @@ export const Home = () => {
           setCounterCircleTime={setCounterCircleTime}
         />
 
-        <Pomodoros stepIndicator={stepIndicator} currentStatus={currentStatus} />
+        <Pomodoros
+          stepIndicator={stepIndicator}
+          currentStatus={currentStatus}
+        />
       </View>
     </View>
   );
