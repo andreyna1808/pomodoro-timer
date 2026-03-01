@@ -1,13 +1,59 @@
 import { Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { ReturnBtn } from "../../shared/components/Header/ReturnBtn";
 import { styles } from "./styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const Settings = () => {
+  const [loaded, setLoaded] = React.useState(false);
   const [focusPeriod, setFocusPeriod] = React.useState(25);
   const [shortBreak, setShortBreak] = React.useState(5);
   const [longBreak, setLongBreak] = React.useState(15);
-  const [notifications, setNotifications] = React.useState(true);
+  const [isNotificationsActivated, setIsNotificationsActivated] =
+    React.useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      AsyncStorage.getItem("NOTIFICATION_ACTIVATED"),
+      AsyncStorage.getItem("SHORT_BREAK_PERIOD"),
+      AsyncStorage.getItem("LONG_BREAK_PERIOD"),
+      AsyncStorage.getItem("FOCUS_PERIOD"),
+    ])
+      .then(([notification, short, long, focus]) => {
+        setIsNotificationsActivated(JSON.parse(notification || "true"));
+        setShortBreak(JSON.parse(short || "5"));
+        setLongBreak(JSON.parse(long || "15"));
+        setFocusPeriod(JSON.parse(focus || "25"));
+      })
+      .finally(() => setLoaded(true));
+  }, []);
+
+  useEffect(() => {
+    if (!loaded) return;
+
+    AsyncStorage.setItem(
+      "NOTIFICATION_ACTIVATED",
+      JSON.stringify(isNotificationsActivated),
+    );
+  }, [isNotificationsActivated, loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
+
+    AsyncStorage.setItem("SHORT_BREAK_PERIOD", JSON.stringify(shortBreak));
+  }, [shortBreak, loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
+
+    AsyncStorage.setItem("LONG_BREAK_PERIOD", JSON.stringify(longBreak));
+  }, [longBreak, loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
+
+    AsyncStorage.setItem("FOCUS_PERIOD", JSON.stringify(focusPeriod));
+  }, [focusPeriod, loaded]);
 
   return (
     <View style={styles.mainContainer}>
@@ -129,17 +175,21 @@ export const Settings = () => {
           <View style={styles.formFieldButtons}>
             <TouchableOpacity
               style={
-                notifications ? styles.primaryButton : styles.secondaryButton
+                isNotificationsActivated
+                  ? styles.primaryButton
+                  : styles.secondaryButton
               }
-              onPress={() => setNotifications(true)}
+              onPress={() => setIsNotificationsActivated(true)}
             >
               <Text style={styles.primaryButtonText}>Ativado</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={
-                notifications ? styles.secondaryButton : styles.primaryButton
+                isNotificationsActivated
+                  ? styles.secondaryButton
+                  : styles.primaryButton
               }
-              onPress={() => setNotifications(false)}
+              onPress={() => setIsNotificationsActivated(false)}
             >
               <Text style={styles.primaryButtonText}>Desativado</Text>
             </TouchableOpacity>

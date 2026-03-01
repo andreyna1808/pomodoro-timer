@@ -41,6 +41,7 @@ export const RenderHomeControls = ({
     setIsPaused(false);
     setCounterCircleTime(counterCircleTime);
     setStepIndicator(1);
+    setCurrentStatus("focus");
   };
 
   const onPressPaused = () => {

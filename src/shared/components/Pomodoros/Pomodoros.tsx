@@ -3,17 +3,45 @@ import { Theme } from "../../themes/Theme";
 
 type TPomodorosProps = {
   stepIndicator: 1 | 2 | 3 | 4;
+  currentStatus?: "focus" | "short_break" | "long_break" | "paused";
 };
 
-export const Pomodoros = ({ stepIndicator }: TPomodorosProps) => {
+export const Pomodoros = ({
+  stepIndicator,
+  currentStatus,
+}: TPomodorosProps) => {
   return (
     <View style={styles.pomodorosContainer}>
       <Text style={styles.pomodorosText}>Pomodoros:</Text>
 
-      <View style={stepIndicator >= 1 ? styles.pomodorosIndicatorComplete : styles.pomodorosIndicator} />
-      <View style={stepIndicator >= 2 ? styles.pomodorosIndicatorComplete : styles.pomodorosIndicator} />
-      <View style={stepIndicator >= 3 ? styles.pomodorosIndicatorComplete : styles.pomodorosIndicator} />
-      <View style={stepIndicator >= 4 ? styles.pomodorosIndicatorComplete : styles.pomodorosIndicator} />
+      <View
+        style={
+          stepIndicator >= 1 || currentStatus === "long_break"
+            ? styles.pomodorosIndicatorComplete
+            : styles.pomodorosIndicator
+        }
+      />
+      <View
+        style={
+          stepIndicator >= 2 || currentStatus === "long_break"
+            ? styles.pomodorosIndicatorComplete
+            : styles.pomodorosIndicator
+        }
+      />
+      <View
+        style={
+          stepIndicator >= 3 || currentStatus === "long_break"
+            ? styles.pomodorosIndicatorComplete
+            : styles.pomodorosIndicator
+        }
+      />
+      <View
+        style={
+          stepIndicator >= 4 || currentStatus === "long_break"
+            ? styles.pomodorosIndicatorComplete
+            : styles.pomodorosIndicator
+        }
+      />
     </View>
   );
 };

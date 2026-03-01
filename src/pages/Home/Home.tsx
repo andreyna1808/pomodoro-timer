@@ -1,5 +1,5 @@
 import { Text, View } from "react-native";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Texts } from "../../shared/components/Texts/Texts";
 import { Progress } from "../../shared/components/Progress/Progress";
 import { Pomodoros } from "../../shared/components/Pomodoros/Pomodoros";
@@ -7,6 +7,8 @@ import { ReturnBtn } from "../../shared/components/Header/ReturnBtn";
 import { styles } from "./styles";
 import { RenderHomeControls } from "../../shared/components/Home/home.controls";
 import { RenderHomeStatusText } from "../../shared/components/Home/home.texts";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 
 export const Home = () => {
   const [isRunning, setIsRunning] = useState(false);
@@ -23,7 +25,22 @@ export const Home = () => {
   const [currentLongBreakCircleTime, setCurrentLongBreakCircleTime] = useState(
     10 * 60,
   );
-  const [counterCircleTime, setCounterCircleTime] = useState(12.5 * 60);
+  const [counterCircleTime, setCounterCircleTime] = useState(25 * 60);
+
+  useFocusEffect( // Toda vez que a tela for focada de novo, ele faz essa consulta (Saio da tela e volto para ela, por exemplo)
+    useCallback(() => {
+      Promise.all([
+        AsyncStorage.getItem("SHORT_BREAK_PERIOD"),
+        AsyncStorage.getItem("LONG_BREAK_PERIOD"),
+        AsyncStorage.getItem("FOCUS_PERIOD"),
+      ]).then(([short, long, focus]) => {
+        setCurrentShortBreakCircleTime(JSON.parse(short || "5") * 60);
+        setCurrentLongBreakCircleTime(JSON.parse(long || "15") * 60);
+        setCurrentFocusCircleTime(JSON.parse(focus || "25") * 60);
+        setCounterCircleTime(JSON.parse(focus || "25") * 60);
+      });
+    }, []),
+  );
 
   useEffect(() => {
     const ref = setInterval(() => {
@@ -125,7 +142,7 @@ export const Home = () => {
           setCounterCircleTime={setCounterCircleTime}
         />
 
-        <Pomodoros stepIndicator={stepIndicator} />
+        <Pomodoros stepIndicator={stepIndicator} currentStatus={currentStatus} />
       </View>
     </View>
   );
